@@ -1,14 +1,13 @@
-from torchvision import datasets, transforms
-import torch
 from pathlib import Path
+
+import torch
+from torchvision import datasets, transforms
 
 
 class Dataloader:
     def __init__(
         self,
-        data_path: Path = Path(__file__)
-        .parent.parent.parent.joinpath("data")
-        .joinpath("leaves"),
+        data_path: Path = Path(__file__).parent.parent.parent.joinpath("data").joinpath("leaves"),
         batch_size: int = 32,
         size: int = 255,
         crop: int = 224,
@@ -38,14 +37,13 @@ class Dataloader:
 
     def get_loader(self, dataset: torch.utils.data.Dataset, shuffle: bool):
         return torch.utils.data.DataLoader(
-            dataset, batch_size=self.batch_size, shuffle=shuffle, workers=self.workers
+            dataset, batch_size=self.batch_size, shuffle=shuffle, num_workers=self.workers
         )
 
     def split_data(self, train_split: float):
+        train_size = int(0.8 * len(self.dataset))
+        test_size = len(self.dataset) - train_size
         return torch.utils.data.random_split(
             self.dataset,
-            [
-                int(train_split * len(self.dataset)),
-                int((1 - train_split) * len(self.dataset)),
-            ],
+            [train_size, test_size],
         )
