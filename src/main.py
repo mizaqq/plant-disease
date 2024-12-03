@@ -5,7 +5,7 @@ from src.model.train import Model
 from src.preprocessing.dataloader import Dataloader
 
 
-def main():
+def main() -> None:
     dataloader = Dataloader(workers=8)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Convolutional()

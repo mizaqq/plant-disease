@@ -5,20 +5,18 @@ from src.preprocessing.dataloader import Dataloader
 
 
 class Model:
-    def __init__(self, model: torch.nn.Module, device: torch.device, data_loader: Dataloader):
+    def __init__(self, model: torch.nn.Module, device: torch.device, data_loader: Dataloader) -> None:
         self.model = model
         self.device = device
         self.data_loader = data_loader
 
-    def train_model(self, lr=0.001, momentum=0.9, epochs=10):
+    def train_model(self, lr: float = 0.001, momentum: float = 0.9, epochs: int = 10) -> None:
         self.model.to(self.device)
         loss_fn = torch.nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=momentum)
         running_loss = 0.0
         count = 1
         for epoch in tqdm(range(epochs), total=epochs):
-            if epoch != 0:
-                print(f'Running loss for epoch {epoch + 1}: {running_loss/(count)}')
             count = 0
             running_loss = 0.0
             for i, data in enumerate(self.data_loader.train_loader):
@@ -31,9 +29,10 @@ class Model:
                 optimizer.step()
                 running_loss += loss.item()
                 count += 1
+            print(f'Running loss for epoch {epoch+1}: {running_loss/(count)}')
         print('Finished Training')
 
-    def test_model(self):
+    def test_model(self) -> None:
         correct = 0
         total = 0
         with torch.no_grad():

@@ -13,7 +13,7 @@ class Dataloader:
         crop: int = 224,
         split: float = 0.8,
         workers: int = 15,
-    ):
+    ) -> None:
         self.data_path = data_path
         self.batch_size = batch_size
         self.transformer = self.get_transformer(size, crop)
@@ -23,7 +23,7 @@ class Dataloader:
         self.train_loader = self.get_loader(self.train_data, shuffle=True)
         self.test_loader = self.get_loader(self.test_data, shuffle=False)
 
-    def get_transformer(self, size: int, crop: int):
+    def get_transformer(self, size: int, crop: int) -> transforms.Compose:
         return transforms.Compose(
             [
                 transforms.Resize(size),
@@ -32,16 +32,16 @@ class Dataloader:
             ]
         )
 
-    def get_dataset(self):
+    def get_dataset(self) -> datasets.ImageFolder:
         return datasets.ImageFolder(self.data_path, transform=self.transformer)
 
-    def get_loader(self, dataset: torch.utils.data.Dataset, shuffle: bool):
+    def get_loader(self, dataset: torch.utils.data.Dataset, shuffle: bool) -> torch.utils.data.DataLoader:
         return torch.utils.data.DataLoader(
             dataset, batch_size=self.batch_size, shuffle=shuffle, num_workers=self.workers
         )
 
-    def split_data(self, train_split: float):
-        train_size = int(0.8 * len(self.dataset))
+    def split_data(self, train_split: float) -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
+        train_size = int(train_split * len(self.dataset))
         test_size = len(self.dataset) - train_size
         return torch.utils.data.random_split(
             self.dataset,
