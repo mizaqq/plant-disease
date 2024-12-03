@@ -40,10 +40,9 @@ class Dataloader:
             dataset, batch_size=self.batch_size, shuffle=shuffle, num_workers=self.workers
         )
 
-    def split_data(self, train_split: float) -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
+    def split_data(
+        self, train_split: float, seed: int = 42
+    ) -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
         train_size = int(train_split * len(self.dataset))
         test_size = len(self.dataset) - train_size
-        return torch.utils.data.random_split(
-            self.dataset,
-            [train_size, test_size],
-        )
+        return torch.utils.data.random_split(self.dataset, [train_size, test_size], torch.Generator().manual_seed(seed))
