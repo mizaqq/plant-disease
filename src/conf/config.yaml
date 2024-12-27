@@ -1,0 +1,12 @@
+data:
+  train: 'model/data/leaves'
+
+workers: 12
+defaults:
+  - models: cnn
+
+hydra:
+  mode: MULTIRUN
+  sweeper:
+    params:
+      models: glob(*)

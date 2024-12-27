@@ -49,7 +49,7 @@ class Model:
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-                self.show_result(images[0], labels[0], predicted[0])
+                #self.show_result(images[0], labels[0], predicted[0])
         print(f"Accuracy of the network on the test images: {100 * correct / total}%")
 
     def show_result(self, fig, label, predicted) -> None:
