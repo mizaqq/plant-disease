@@ -7,11 +7,13 @@ import cv2
 
 
 class Model:
-    def __init__(
-        self, model: torch.nn.Module, device: torch.device, data_loader: Dataloader
-    ) -> None:
+    def __init__(self, 
+                 model: torch.nn.Module,
+                 data_loader: Dataloader,
+                 device: torch.device = None
+        ) -> None:
         self.model = model
-        self.device = device
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu") if device is None else device
         self.data_loader = data_loader
 
     def train_model(
@@ -50,7 +52,8 @@ class Model:
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
                 #self.show_result(images[0], labels[0], predicted[0])
-        print(f"Accuracy of the network on the test images: {100 * correct / total}%")
+        result = {"test": 100 * correct / total}
+        return result
 
     def show_result(self, fig, label, predicted) -> None:
         fig = fig.permute(1, 2, 0).cpu().numpy()
