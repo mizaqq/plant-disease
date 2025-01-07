@@ -26,8 +26,8 @@ class Convolutional(torch.nn.Module):
         x = self.fc2(x)
         x = F.softmax(x, dim=1)
         return x
-
-    def num_flat_features(self, x: torch.Tensor) -> int:
+    @staticmethod
+    def num_flat_features(x: torch.Tensor) -> int:
         size = x.size()[1:]
         num_features = 1
         for s in size:
