@@ -11,8 +11,8 @@ def main(lr: float = 0.001, momentum: float = 0.9) -> None:
     model = Convolutional()
     model_instance = Model(model, device, dataloader, optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum))
     model_instance.train_model()
-    model_instance.test_model()
-
+    labels,predict = model_instance.test_model()
+    model_instance.calculate_metrics(labels, predict)
 
 if __name__ == "__main__":
     main()
