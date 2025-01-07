@@ -5,15 +5,15 @@ from src.preprocessing.dataloader import Dataloader
 
 
 class Model:
-    def __init__(self, model: torch.nn.Module, device: torch.device, data_loader: Dataloader) -> None:
+    def __init__(self, model: torch.nn.Module, device: torch.device, data_loader: Dataloader, optimizer: torch, loss_fn:torch=torch.nn.CrossEntropyLoss()) -> None:
         self.model = model
         self.device = device
         self.data_loader = data_loader
-
-    def train_model(self, lr: float = 0.001, momentum: float = 0.9, epochs: int = 10) -> None:
+        self.optimizer = optimizer
+        self.loss_fn = loss_fn
+    def train_model(self, epochs: int = 10) -> None:
         self.model.to(self.device)
-        loss_fn = torch.nn.CrossEntropyLoss()
-        optimizer = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=momentum)
+
         running_loss = 0.0
         count = 1
         for epoch in tqdm(range(epochs), total=epochs):
@@ -22,11 +22,11 @@ class Model:
             for i, data in enumerate(self.data_loader.train_loader):
                 inputs, labels = data
                 inputs, labels = inputs.to(self.device), labels.to(self.device)
-                optimizer.zero_grad()
+                self.optimizer.zero_grad()
                 outputs = self.model(inputs)
-                loss = loss_fn(outputs, labels)
+                loss = self.loss_fn(outputs, labels)
                 loss.backward()
-                optimizer.step()
+                self.optimizer.step()
                 running_loss += loss.item()
                 count += 1
             print(f'Running loss for epoch {epoch+1}: {running_loss/(count)}')
