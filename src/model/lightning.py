@@ -4,13 +4,12 @@ import torch
 
 
 class LightningModule(L.LightningModule):
-    def __init__(self, model, lr=0.001, momentum=0.9, epochs=10) -> None:
+    def __init__(self, model, optimizer, epochs=10) -> None:
         super().__init__()
         self.model = model
-        self.lr = lr
-        self.momentum = momentum
+        self.optimizer = optimizer
         self.epochs = epochs
-             
+
     def forward(self, inputs):
         return self.model(inputs)
 
@@ -19,19 +18,18 @@ class LightningModule(L.LightningModule):
         y_hat = self(x)
         loss = F.cross_entropy(y_hat, y)
         return loss
-    
-    def test_step(self,batch,batch_idx) -> None:
+
+    def test_step(self, batch, batch_idx) -> None:
         images, labels = batch
         preds = self.model(images).argmax(dim=-1)
         acc = (labels == preds).float().mean()
         self.log("test_acc", acc)
 
-    
     def configure_optimizers(self):
-        optimizer = torch.optim.SGD(self.model.parameters(), lr=self.lr, momentum=self.momentum)
+        optimizer = self.optimizer
         return optimizer
-    
-    def train_model_lightning(self,data_loader):
+
+    def train_model_lightning(self, data_loader):
         trainer = L.Trainer(max_epochs=self.epochs)
         trainer.fit(self, data_loader.train_loader)
         test_result = trainer.test(self, dataloaders=data_loader.test_loader, verbose=False)
