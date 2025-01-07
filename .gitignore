@@ -162,5 +162,5 @@ cython_debug/
 #.idea/
 data/
 multirun/
-lightning_logs/.vscode/
+lightning_logs/
 .vscode/
