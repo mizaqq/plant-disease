@@ -23,7 +23,8 @@ class Dataloader:
         self.train_loader = self.get_loader(self.train_data, shuffle=True)
         self.test_loader = self.get_loader(self.test_data, shuffle=False)
 
-    def get_transformer(self, size: int, crop: int) -> transforms.Compose:
+    @staticmethod
+    def get_transformer(size: int, crop: int) -> transforms.Compose:
         return transforms.Compose(
             [
                 transforms.Resize(size),
