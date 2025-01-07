@@ -32,7 +32,7 @@ def main(cfg: DictConfig) -> None:
                 model.parameters(), lr=cfg.models.params.train.lr, momentum=cfg.models.params.train.momentum
             ),
         )
-        model = model_instance.train_model(cfg.models.params.train.epochs)
+        model_instance.train_model(cfg.models.params.train.epochs)
         labels, predict = model_instance.test_model()
         model_instance.calculate_metrics(labels, predict, cfg.models.params.metrics)
 

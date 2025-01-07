@@ -55,7 +55,9 @@ class Model:
         return labels_list, predicted_labels
 
     @staticmethod
-    def calculate_metrics(labels_list, predicted_labels, metrics=['accuracy', 'precision', 'recall', 'f1']):
+    def calculate_metrics(
+        labels_list: list, predicted_labels: list, metrics: list = ['accuracy', 'precision', 'recall', 'f1']
+    ) -> None:
         if 'accuracy' in metrics:
             print(f'Accuracy: {accuracy_score(labels_list, predicted_labels)}')
         if 'precision' in metrics:
@@ -68,7 +70,7 @@ class Model:
             print(f'Classification Report: {classification_report(labels_list, predicted_labels, average="weighted")}')
 
     @staticmethod
-    def show_result(fig, label, predicted) -> None:
+    def show_result(fig: torch.Tensor, label: list, predicted: list) -> None:
         fig = fig.permute(1, 2, 0).cpu().numpy()
         print(f"Actual: {label}, Predicted: {predicted}")
         cv2.imshow(f"image: {predicted},label: {label}", fig)

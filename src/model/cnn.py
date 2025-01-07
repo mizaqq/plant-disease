@@ -1,10 +1,11 @@
 import hydra
 import torch
 import torch.nn.functional as F
+from omegaconf import DictConfig
 
 
 class Convolutional(torch.nn.Module):
-    def __init__(self, cfg) -> None:
+    def __init__(self, cfg: DictConfig) -> None:
         super(Convolutional, self).__init__()
         self.layers = torch.nn.ModuleDict({k: hydra.utils.instantiate(v) for k, v in cfg.models.params.layers.items()})
         self.pool_indices = cfg.models.params.get("pool_indices", [])
