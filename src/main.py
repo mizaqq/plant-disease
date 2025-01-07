@@ -31,7 +31,7 @@ def main(cfg: DictConfig) -> None:
             ),
         )
         model = model_instance.train_model(cfg.models.params.train.epochs)
-        result = model_instance.test_model()
+        labels, predict = model_instance.test_model()
     print(f'Accuracy of the network on the test images: {result["test"]}')
 
 
