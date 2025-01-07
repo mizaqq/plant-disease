@@ -56,19 +56,16 @@ class Model:
 
     @staticmethod
     def calculate_metrics(labels_list, predicted_labels, metrics=['accuracy', 'precision', 'recall', 'f1']):
-        for metric in metrics:
-            if metric == 'accuracy':
-                print(f'Accuracy: {accuracy_score(labels_list, predicted_labels)}')
-            elif metric == 'precision':
-                print(f'Precision: {precision_score(labels_list, predicted_labels, average="weighted")}')
-            elif metric == 'recall':
-                print(f'Recall: {recall_score(labels_list, predicted_labels, average="weighted")}')
-            elif metric == 'f1':
-                print(f'F1 Score: {f1_score(labels_list, predicted_labels, average="weighted")}')
-            elif metric == 'classification_report':
-                print(
-                    f'Classification Report: {classification_report(labels_list, predicted_labels, average="weighted")}'
-                )
+        if 'accuracy' in metrics:
+            print(f'Accuracy: {accuracy_score(labels_list, predicted_labels)}')
+        if 'precision' in metrics:
+            print(f'Precision: {precision_score(labels_list, predicted_labels, average="weighted")}')
+        if 'recall' in metrics:
+            print(f'Recall: {recall_score(labels_list, predicted_labels, average="weighted")}')
+        if 'f1' in metrics:
+            print(f'F1 Score: {f1_score(labels_list, predicted_labels, average="weighted")}')
+        if 'classification_report' in metrics:
+            print(f'Classification Report: {classification_report(labels_list, predicted_labels, average="weighted")}')
 
     @staticmethod
     def show_result(fig, label, predicted) -> None:

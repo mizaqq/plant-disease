@@ -22,6 +22,8 @@ def main(cfg: DictConfig) -> None:
             epochs=cfg.models.params.train.epochs,
         )
         model, result = model_light.train_model_lightning(dataloader)
+        for k, v in result[0].items():
+            print(f'{k}: {v}')
     elif cfg.training == 'torch':
         model_instance = Model(
             model,
@@ -32,7 +34,7 @@ def main(cfg: DictConfig) -> None:
         )
         model = model_instance.train_model(cfg.models.params.train.epochs)
         labels, predict = model_instance.test_model()
-    print(f'Accuracy of the network on the test images: {result["test"]}')
+        model_instance.calculate_metrics(labels, predict, cfg.models.params.metrics)
 
 
 if __name__ == "__main__":
