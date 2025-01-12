@@ -1,4 +1,5 @@
 import cv2
+import mlflow
 import torch
 from sklearn.metrics import accuracy_score, classification_report, f1_score, precision_score, recall_score
 from tqdm import tqdm
@@ -38,7 +39,7 @@ class Model:
                 self.optimizer.step()
                 running_loss += loss.item()
                 count += 1
-            print(f"Running loss for epoch {epoch+1}: {running_loss/(count)}")
+            print(f"Running loss for epoch {epoch + 1}: {running_loss / (count)}")
         print("Finished Training")
 
     def test_model(self) -> tuple[list, list]:
@@ -56,18 +57,30 @@ class Model:
 
     @staticmethod
     def calculate_metrics(
-        labels_list: list, predicted_labels: list, metrics: list = ['accuracy', 'precision', 'recall', 'f1']
+        labels_list: list,
+        predicted_labels: list,
+        metrics: list = ['accuracy', 'precision', 'recall', 'f1', 'classification_report'],
     ) -> None:
         if 'accuracy' in metrics:
-            print(f'Accuracy: {accuracy_score(labels_list, predicted_labels)}')
+            acc = accuracy_score(labels_list, predicted_labels)
+            print(f'Accuracy: {acc}')
+            mlflow.log_metric("Accuracy", acc)
         if 'precision' in metrics:
-            print(f'Precision: {precision_score(labels_list, predicted_labels, average="weighted")}')
+            precision = precision_score(labels_list, predicted_labels, average="weighted")
+            print(f'Precision: {precision}')
+            mlflow.log_metric("Precision", precision)
         if 'recall' in metrics:
-            print(f'Recall: {recall_score(labels_list, predicted_labels, average="weighted")}')
+            recall = recall_score(labels_list, predicted_labels, average="weighted")
+            print(f'Recall: {recall}')
+            mlflow.log_metric("Recall", recall)
         if 'f1' in metrics:
-            print(f'F1 Score: {f1_score(labels_list, predicted_labels, average="weighted")}')
+            f1 = f1_score(labels_list, predicted_labels, average="weighted")
+            print(f'F1 Score: {f1}')
+            mlflow.log_metric("F1 Score", f1)
         if 'classification_report' in metrics:
-            print(f'Classification Report: {classification_report(labels_list, predicted_labels, average="weighted")}')
+            c_report = classification_report(labels_list, predicted_labels, average="weighted")
+            print(f'Classification Report: {c_report}')
+            mlflow.log_text("Classification Report", c_report)
 
     @staticmethod
     def show_result(fig: torch.Tensor, label: list, predicted: list) -> None:

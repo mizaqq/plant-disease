@@ -1,7 +1,7 @@
 data:
   train: 'model/data/leaves'
 
-training: 'torch'
+training: 'lightning'
 workers: 12
 defaults:
   - models: cnn
