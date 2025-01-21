@@ -4,7 +4,7 @@ import mlflow
 
 
 class MLFlowHandler:
-    def __init__(self):
+    def __init__(self) -> None:
         self.login()
         self.run = mlflow.start_run()
 
@@ -14,5 +14,5 @@ class MLFlowHandler:
         mlflow.set_experiment(experiment)
 
     @staticmethod
-    def close():
+    def close() -> None:
         mlflow.end_run()
