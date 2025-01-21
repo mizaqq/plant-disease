@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 from sklearn.metrics import accuracy_score, classification_report, f1_score, precision_score, recall_score
 
-from preprocessing.dataloader import Dataloader
+from src.preprocessing.dataloader import Dataloader
 
 
 class LightningModule(L.LightningModule):
