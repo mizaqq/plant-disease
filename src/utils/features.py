@@ -1,4 +1,7 @@
+import random
+
 import cv2
+import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -61,3 +64,44 @@ def generate_grad_cam_map(
     image_rgb = cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB)
     plt.imshow(image_rgb)
     plt.show()
+
+
+def get_sample_images(txt_paths_list, image_paths_list, sample=8):
+    image_text = []
+    for path in random.sample(txt_paths_list, sample):
+        with open(path, 'r') as f:
+            txt = f.read().split('\n')[0]
+        image = next(f for f in image_paths_list if path.name.split('.')[0] in f)
+        img = plt.imread(image)
+        image_text.append((img, txt))
+    return image_text
+
+
+def show_annotations(image_text, row_images=4):
+    for j in range(0, len(image_text), row_images):
+        fig, ax = plt.subplots(1, row_images, figsize=(15, 15))
+        for i in range(j - row_images, j):
+            img, txt = image_text[i]
+            image_height, image_width, _ = img.shape
+            elements = txt.split()
+            class_id = int(elements[0])
+            x_center, y_center, bbox_width, bbox_height = map(float, elements[1:])
+
+            x_center_pixel = x_center * image_width
+            y_center_pixel = y_center * image_height
+            bbox_width_pixel = bbox_width * image_width
+            bbox_height_pixel = bbox_height * image_height
+
+            x1 = int(x_center_pixel - bbox_width_pixel / 2)
+            y1 = int(y_center_pixel - bbox_height_pixel / 2)
+            x2 = int(x_center_pixel + bbox_width_pixel / 2)
+            y2 = int(y_center_pixel + bbox_height_pixel / 2)
+            ax[i - j].imshow(img)
+            rect = patches.Rectangle(
+                (x1, y1), bbox_width_pixel, bbox_height_pixel, linewidth=2, edgecolor='lime', facecolor='none'
+            )
+            ax[i - j].add_patch(rect)
+            label = f"Class {class_id}"
+            ax[i - j].text(x1, y1 - 10, label, color='lime', fontsize=12, backgroundcolor='black')
+            plt.axis('off')
+        plt.show()
