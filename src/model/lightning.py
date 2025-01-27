@@ -29,6 +29,18 @@ class LightningModule(L.LightningModule):
         loss = F.cross_entropy(y_hat, y)
         return loss
 
+
+    def configure_optimizers(self) -> torch.optim.Optimizer:
+        optimizer = self.optimizer
+        return optimizer
+
+    def train_model_lightning(self, data_loader: Dataloader) -> tuple[torch.nn.Module, dict]:
+        trainer = L.Trainer(max_epochs=self.epochs)
+        trainer.fit(self, data_loader.train_loader)
+        test_result = trainer.test(self, dataloaders=data_loader.test_loader, verbose=False)
+        return self.model, test_result
+    
+    @staticmethod
     def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:
         images, labels = batch
         preds = self.model(images).argmax(dim=-1)
@@ -42,13 +54,3 @@ class LightningModule(L.LightningModule):
             self.log('F1', f1_score(labels, preds, average="weighted"))
         if 'classification_report' in self.metrics:
             self.log('classification_report', classification_report(labels, preds))
-
-    def configure_optimizers(self) -> torch.optim.Optimizer:
-        optimizer = self.optimizer
-        return optimizer
-
-    def train_model_lightning(self, data_loader: Dataloader) -> tuple[torch.nn.Module, dict]:
-        trainer = L.Trainer(max_epochs=self.epochs)
-        trainer.fit(self, data_loader.train_loader)
-        test_result = trainer.test(self, dataloaders=data_loader.test_loader, verbose=False)
-        return self.model, test_result

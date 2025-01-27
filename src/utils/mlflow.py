@@ -3,16 +3,17 @@ import os
 import mlflow
 
 
-class MLFlowHandler:
-    def __init__(self):
+class MLFlowRunManager:
+    def __init__(self) -> None:
         self.login()
-        self.run = mlflow.start_run()
+        self.manager = mlflow
+        self.manager.start_run()
 
-    @staticmethod
-    def login(uri: str = os.environ.get("MLFLOW_URI", "http://localhost:5000"), experiment: str = "default") -> None:
-        mlflow.set_tracking_uri(uri)
-        mlflow.set_experiment(experiment)
+    def login(
+        self, uri: str = os.environ.get("MLFLOW_URI", "http://localhost:5000"), experiment: str = "default"
+    ) -> None:
+        self.manager.set_tracking_uri(uri)
+        self.manager.set_experiment(experiment)
 
-    @staticmethod
-    def close():
-        mlflow.end_run()
+    def close(self) -> None:
+        self.manager.end_run()
