@@ -5,7 +5,7 @@ from sklearn.metrics import accuracy_score, classification_report, f1_score, pre
 from tqdm import tqdm
 
 from src.preprocessing.dataloader import Dataloader
-
+from sklearn.metrics import accuracy_score, classification_report, precision_score, recall_score, f1_score
 
 class Model:
     def __init__(
@@ -85,3 +85,4 @@ class Model:
         print(f"Actual: {label}, Predicted: {predicted}")
         cv2.imshow(f"image: {predicted},label: {label}", fig)
         cv2.waitKey(0)
+
