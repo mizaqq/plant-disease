@@ -1,0 +1,62 @@
+train:
+  lr: 0.001
+  momentum: 0.9
+  epochs: 10
+
+metrics:
+  - accuracy
+  - f1
+  - precision
+  - recall
+pool_indices:
+  - 0
+  - 2
+
+layers:
+  conv1:
+      _target_: torch.nn.Conv2d
+      in_channels: 3
+      out_channels: 32
+      kernel_size: 3
+      stride: 2
+      padding_mode: replicate
+  conv2:
+      _target_: torch.nn.Conv2d
+      in_channels: 32
+      out_channels: 64
+      kernel_size: 3
+      stride: 2
+      padding_mode: replicate
+  conv3:
+      _target_: torch.nn.Conv2d
+      in_channels: 64
+      out_channels: 128
+      kernel_size: 3
+      stride: 2
+      padding_mode: replicate
+  conv4:
+      _target_: torch.nn.Conv2d
+      in_channels: 128
+      out_channels: 256
+      kernel_size: 3
+      stride: 1
+      padding_mode: replicate
+  conv5:
+      _target_: torch.nn.Conv2d
+      in_channels: 256
+      out_channels: 512
+      kernel_size: 3
+      stride: 1
+      padding_mode: replicate
+  fc1:
+      _target_: torch.nn.Linear
+      in_features: 2048
+      out_features: 128
+  fc2:
+      _target_: torch.nn.Linear
+      in_features: 128
+      out_features: 32
+  fc3:
+      _target_: torch.nn.Linear
+      in_features: 32
+      out_features: 4

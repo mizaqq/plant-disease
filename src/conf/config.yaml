@@ -1,0 +1,13 @@
+data:
+  train: 'model/data/leaves'
+
+training: 'torch'
+workers: 12
+defaults:
+  - models: cnn
+
+hydra:
+  mode: MULTIRUN
+  sweeper:
+    params:
+      models: glob(*)
