@@ -53,3 +53,4 @@ class LightningModule(L.LightningModule):
             self.log('F1', f1_score(labels, preds, average="weighted"))
         if 'classification_report' in self.metrics:
             self.log('classification_report', classification_report(labels, preds))
+

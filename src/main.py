@@ -49,6 +49,5 @@ def main(cfg: DictConfig) -> None:
     mlflow.pytorch.log_model(model, "model")
     mlflow.close()
 
-
 if __name__ == "__main__":
     main()
