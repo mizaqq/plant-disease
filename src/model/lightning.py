@@ -39,7 +39,6 @@ class LightningModule(L.LightningModule):
         test_result = trainer.test(self, dataloaders=data_loader.test_loader, verbose=False)
         return self.model, test_result
 
-    @staticmethod
     def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:
         images, labels = batch
         preds = self.model(images).argmax(dim=-1)
@@ -53,4 +52,3 @@ class LightningModule(L.LightningModule):
             self.log('F1', f1_score(labels, preds, average="weighted"))
         if 'classification_report' in self.metrics:
             self.log('classification_report', classification_report(labels, preds))
-

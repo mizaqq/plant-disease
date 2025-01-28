@@ -5,8 +5,8 @@ import mlflow
 
 class MLFlowRunManager:
     def __init__(self) -> None:
-        self.login()
         self.manager = mlflow
+        self.login()
         self.manager.start_run()
 
     def login(
