@@ -1,13 +1,15 @@
 data:
   train: 'model/data/leaves'
 
-training: 'torch'
+training: 'lightning'
 workers: 12
 defaults:
-  - models: cnn
-
+  - models: resnet
+  - override hydra/launcher: basic
+  - override hydra/sweeper: basic
 hydra:
   mode: MULTIRUN
   sweeper:
     params:
-      models: glob(*)
+      models: resnet
+      models/params: resnet/params2

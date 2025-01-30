@@ -85,4 +85,3 @@ class Model:
         print(f"Actual: {label}, Predicted: {predicted}")
         cv2.imshow(f"image: {predicted},label: {label}", fig)
         cv2.waitKey(0)
-

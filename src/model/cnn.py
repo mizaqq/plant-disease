@@ -23,7 +23,7 @@ class Convolutional(torch.nn.Module):
             elif isinstance(layer, torch.nn.Dropout):
                 x = layer(x)
         return F.softmax(x, dim=1)
-      
+
     @staticmethod
     def num_flat_features(x: torch.Tensor) -> int:
         size = x.size()[1:]
