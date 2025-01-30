@@ -5,6 +5,11 @@ training: 'lightning'
 workers: 12
 defaults:
   - models: resnet
-
+  - override hydra/launcher: basic
+  - override hydra/sweeper: basic
 hydra:
-  mode: RUN
+  mode: MULTIRUN
+  sweeper:
+    params:
+      models: resnet
+      models/params: resnet/params2
