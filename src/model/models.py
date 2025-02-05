@@ -11,7 +11,9 @@ class PretrainedModel:
         self.unfreeze_layers(cfg.models.params.trainable_layers)
 
     def _setup_classifier(self, classifier, num_classes: int = 10):
-        if hasattr(self.model, classifier):
+        if hasattr(self.model, 'roi_heads'):
+            setattr(self.model, 'roi_heads.box_predictor', classifier)
+        elif hasattr(self.model, classifier):
             setattr(self.model, classifier, torch.nn.Linear(getattr(self.model, classifier).in_features, num_classes))
 
     def freeze_layers(self, layer: int) -> None:
@@ -20,10 +22,16 @@ class PretrainedModel:
                 param.requires_grad = False
 
     def unfreeze_layers(self, trainable_layers: list[str]) -> None:
-        for layer_name in trainable_layers:
-            if hasattr(self.model, layer_name):
-                for param in getattr(self.model, layer_name).parameters():
-                    param.requires_grad = True
+        if self.model.__str__().startswith('FasterRCNN'):
+            for layer_name in trainable_layers:
+                if hasattr(self.model.backbone.body, layer_name):
+                    for param in getattr(self.model.backbone.body, layer_name).parameters():
+                        param.requires_grad = True
+        else:
+            for layer_name in trainable_layers:
+                if hasattr(self.model, layer_name):
+                    for param in getattr(self.model, layer_name).parameters():
+                        param.requires_grad = True
 
     @staticmethod
     def get_model(cfg: DictConfig) -> torch.nn.Module:

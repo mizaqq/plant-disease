@@ -1,15 +1,16 @@
 data:
   train: 'model/data/leaves'
-
+  annotations_path: '/home/miza/plant-disease/data/annotation/YOLO/leaves'
 training: 'lightning'
 workers: 12
 defaults:
   - models: resnet
   - override hydra/launcher: basic
   - override hydra/sweeper: basic
+
 hydra:
   mode: MULTIRUN
   sweeper:
     params:
-      models: resnet
-      models/params: resnet/params2
+      models: fr-cnn
+      models/params: fr-cnn/params

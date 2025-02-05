@@ -1,0 +1,10 @@
+label_config: |
+  <View>
+    <Image name="image" value="$image"/>
+    <Choices name="choice" toName="image">
+      <Choice value="healthy"/>
+      <Choice value="diseased"/>
+    </Choices>
+  </View>
+
+project_name: "Plant Disease Detection"

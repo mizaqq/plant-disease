@@ -1,9 +1,10 @@
 import lightning as L
 import torch
 import torch.nn.functional as F
+import ultralytics
 from sklearn.metrics import accuracy_score, classification_report, f1_score, precision_score, recall_score
 
-from preprocessing.dataloader import Dataloader
+from src.preprocessing.dataloader import Dataloader
 
 
 class LightningModule(L.LightningModule):
@@ -25,8 +26,12 @@ class LightningModule(L.LightningModule):
 
     def training_step(self, batch: torch.Tensor, batch_idx: int) -> torch.Tensor:
         x, y = batch
-        y_hat = self(x)
-        loss = F.cross_entropy(y_hat, y)
+        if self.model.__str__().startswith('FasterRCNN'):
+            loss_dict = self.model(x, y)
+            loss = sum(loss for loss in loss_dict.values())
+        else:
+            y_hat = self(x)
+            loss = F.cross_entropy(y_hat, y)
         return loss
 
     def configure_optimizers(self) -> torch.optim.Optimizer:
