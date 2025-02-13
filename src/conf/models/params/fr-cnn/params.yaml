@@ -1,7 +1,7 @@
 train:
   lr: 0.001
   momentum: 0.9
-  epochs: 10
+  epochs: 1
 
 model:
   _target_: torchvision.models.detection.fasterrcnn_resnet50_fpn
@@ -15,7 +15,7 @@ optimizers:
 
 classifier:
   _target_: torchvision.models.detection.faster_rcnn.FastRCNNPredictor
-  in_features: 1024
+  in_channels: 1024
   num_classes: ${models.params.num_classes}
 
 num_classes: 5

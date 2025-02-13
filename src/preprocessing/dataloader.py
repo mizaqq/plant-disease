@@ -28,20 +28,20 @@ class FRCNNImageFolder(datasets.ImageFolder):
             with open(label_path, "r") as f:
                 for line in f.readlines():
                     values = [float(x) for x in line.strip().split()]
-                    label, cx, cy, w, h = values
-                    x_min = cx - (w / 2)
-                    y_min = cy - (h / 2)
-                    x_max = cx + (w / 2)
-                    y_max = cy + (h / 2)
-                    targets.append([x_min, y_min, x_max, y_max, label])
+                    label, cx, cy, w, h = values  # YOLO format (normalized)
+                    x_min = int((cx - w / 2) * 244)
+                    y_min = int((cy - h / 2) * 244)
+                    x_max = int((cx + w / 2) * 244)
+                    y_max = int((cy + h / 2) * 244)
+
+                    targets.append([x_min, y_min, x_max, y_max, label + 1])
 
         if targets:
             targets = torch.tensor(targets, dtype=torch.float32)
             boxes = targets[:, :4]
             labels = targets[:, 4].long()
         else:
-            boxes = torch.empty((0, 4), dtype=torch.float32)
-            labels = torch.empty((0,), dtype=torch.int64)
+            return None
 
         return {"boxes": boxes, "labels": labels}
 
@@ -99,5 +99,10 @@ class Dataloader:
 
     @staticmethod
     def collate_fn(batch):
-        images, targets = zip(*batch)  # ✅ Unzips batch into two lists
-        return list(images), list(targets)
+        images, targets = [], []
+        for img, target in batch:
+            if target is None:
+                continue
+            images.append(img)
+            targets.append(target)
+        return images, targets

@@ -1,17 +1,16 @@
 import time
+from pathlib import Path
 
 import hydra
-import torch
 from omegaconf import DictConfig, OmegaConf
 
 from src.model.cnn import Convolutional
-from src.model.lightning import LightningModule
+from src.model.lightning import LightningModule, FasterCNNLightning
 from src.model.models import PretrainedModel
 from src.model.train import Model
 from src.preprocessing.dataloader import Dataloader
-from src.utils.mlflow import MLFlowRunManager
 from src.utils.draw_annotations import draw_yolo_annotations
-from pathlib import Path
+from src.utils.mlflow import MLFlowRunManager
 
 
 @hydra.main(version_base=None, config_path="./conf", config_name="config")
@@ -32,11 +31,18 @@ def main(cfg: DictConfig) -> None:
     optimizer_params = cfg.models.params.optimizers.params
     optimizer = optimizer_cls(model.parameters(), **optimizer_params)
     if cfg.training == 'lightning':
-        model_light = LightningModule(
-            model,
-            optimizer=optimizer,
-            epochs=cfg.models.params.train.epochs,
-        )
+        if cfg.models.type == 'fr-cnn':
+            model_light = FasterCNNLightning(
+                model,
+                optimizer=optimizer,
+                epochs=cfg.models.params.train.epochs,
+            )
+        else:
+            model_light = LightningModule(
+                model,
+                optimizer=optimizer,
+                epochs=cfg.models.params.train.epochs,
+            )
         model, results = model_light.train_model_lightning(dataloader)
         for k, v in results[0].items():
             mlflow.manager.log_metric(k, v)
@@ -53,9 +59,7 @@ def main(cfg: DictConfig) -> None:
         for key, value in results.items():
             mlflow.manager.log_metric(key, value)
             print(f'{key}: {value}')
-    if cfg.params.models == 'yolo':
-        draw_yolo_annotations(results, dataloader)
-
+    draw_yolo_annotations(model, dataloader.test_loader)
     mlflow.manager.log_metric("Run time", time.time() - start)
     mlflow.manager.pytorch.log_model(model, "model")
     mlflow.close()

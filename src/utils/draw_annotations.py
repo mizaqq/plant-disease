@@ -1,13 +1,13 @@
-from typing import List
-
 import cv2
+import torch
 import numpy as np
-
+import matplotlib.pyplot as plt
+from typing import List
 from src.preprocessing.dataloader import Dataloader
 
 
 def draw_yolo_annotations(
-    results: list,
+    model: torch.nn.Module,
     dataloader: Dataloader,
     class_names: List[str] = ['curl', 'healthy', 'slug', 'spot'],
     color_map: dict = None,
@@ -17,24 +17,28 @@ def draw_yolo_annotations(
     if color_map is None:
         color_map = {i: tuple(np.random.randint(0, 255, 3).tolist()) for i in range(len(class_names))}
 
-    for box, label, image in zip(results, dataloader.test_loader):
-        h, w = image.shape[:2]
-        annotated_image = image.copy()
-        x_center, y_center, width, height = box
-        x1 = int((x_center - width / 2) * w)
-        y1 = int((y_center - height / 2) * h)
-        x2 = int((x_center + width / 2) * w)
-        y2 = int((y_center + height / 2) * h)
+    for image, _ in dataloader:
+        preds = model(image)
+        image_vis = (image * 255).byte().cpu().numpy() if image.max() <= 1 else image.cpu().numpy()
 
-        color = color_map[label]
+        boxes = preds[0]['boxes'].detach().cpu().numpy()
+        labels = preds[0]['labels'].detach().cpu().numpy()
 
-        cv2.rectangle(annotated_image, (x1, y1), (x2, y2), color, thickness)
+        for box, label in zip(boxes, labels):
+            x_min, y_min, x_max, y_max = map(int, box)
+            color = color_map.get(label, (0, 255, 0))
+            cv2.rectangle(image_vis, (x_min, y_min), (x_max, y_max), color, thickness)
+            cv2.putText(
+                image_vis,
+                class_names[label - 1],
+                (x_min, y_min - 5),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                font_scale,
+                color,
+                thickness,
+            )
 
-        label_text = f"{class_names[label]}"
-        (text_width, text_height), _ = cv2.getTextSize(label_text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, thickness)
-        cv2.rectangle(annotated_image, (x1, y1 - text_height - 5), (x1 + text_width, y1), color, -1)
-        cv2.putText(
-            annotated_image, label_text, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 255), thickness
-        )
-
-    return annotated_image
+        plt.figure(figsize=(6, 6))
+        plt.imshow(cv2.cvtColor(image_vis, cv2.COLOR_BGR2RGB))
+        plt.axis("off")
+        plt.show()

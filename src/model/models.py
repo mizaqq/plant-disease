@@ -12,7 +12,7 @@ class PretrainedModel:
 
     def _setup_classifier(self, classifier, num_classes: int = 10):
         if hasattr(self.model, 'roi_heads'):
-            setattr(self.model, 'roi_heads.box_predictor', classifier)
+            self.model.roi_heads.box_predictor = hydra.utils.instantiate(classifier)
         elif hasattr(self.model, classifier):
             setattr(self.model, classifier, torch.nn.Linear(getattr(self.model, classifier).in_features, num_classes))
 
