@@ -19,22 +19,20 @@ def draw_yolo_annotations(
     model.eval()
     for image, _ in dataloader:
         preds = model(image)
-        image_vis = (image * 255).byte().cpu().numpy() if image.max() <= 1 else image.cpu().numpy()
-
         boxes = preds[0]['boxes'].detach().cpu().numpy()
         labels = preds[0]['labels'].detach().cpu().numpy()
-
-        for box, label in zip(boxes, labels):
+        for box, label, imagex in zip(boxes, labels, image):
+            imagex = imagex.permute(1, 2, 0).cpu().numpy()
+            image_vis = (imagex * 255).astype(np.uint8)
             x_min, y_min, x_max, y_max = map(int, box)
-            color = color_map.get(label, (0, 255, 0))
-            cv2.rectangle(image_vis, (x_min, y_min), (x_max, y_max), color, thickness)
+            cv2.rectangle(image_vis, (x_min, y_min), (x_max, y_max), (0, 255, 0), thickness)
             cv2.putText(
                 image_vis,
                 class_names[label - 1],
                 (x_min, y_min - 5),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 font_scale,
-                color,
+                (0, 255, 0),
                 thickness,
             )
 
