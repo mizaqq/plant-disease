@@ -16,7 +16,7 @@ def draw_yolo_annotations(
 ) -> np.ndarray:
     if color_map is None:
         color_map = {i: tuple(np.random.randint(0, 255, 3).tolist()) for i in range(len(class_names))}
-
+    model.eval()
     for image, _ in dataloader:
         preds = model(image)
         image_vis = (image * 255).byte().cpu().numpy() if image.max() <= 1 else image.cpu().numpy()
