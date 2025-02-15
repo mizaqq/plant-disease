@@ -7,6 +7,7 @@ from tqdm import tqdm
 from src.preprocessing.dataloader import Dataloader
 from sklearn.metrics import accuracy_score, classification_report, precision_score, recall_score, f1_score
 
+
 class Model:
     def __init__(
         self,
@@ -60,7 +61,7 @@ class Model:
         labels_list: list,
         predicted_labels: list,
         metrics: list = ['accuracy', 'precision', 'recall', 'f1', 'classification_report'],
-    ) -> None:
+    ) -> dict:
         results = {}
         if 'accuracy' in metrics:
             acc = accuracy_score(labels_list, predicted_labels)

@@ -10,7 +10,7 @@ class PretrainedModel:
         self._setup_classifier(cfg.models.params.classifier, cfg.models.params.num_classes)
         self.unfreeze_layers(cfg.models.params.trainable_layers)
 
-    def _setup_classifier(self, classifier, num_classes: int = 10):
+    def _setup_classifier(self, classifier: DictConfig, num_classes: int = 10) -> None:
         if hasattr(self.model, 'roi_heads'):
             self.model.roi_heads.box_predictor = hydra.utils.instantiate(classifier)
         elif hasattr(self.model, classifier):

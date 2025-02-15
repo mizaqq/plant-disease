@@ -1,13 +1,18 @@
 from pathlib import Path
+from typing import Any, Callable, Optional, Tuple
 
 import torch
-from PIL import Image
 from torchvision import datasets, transforms
-from typing import Any, Tuple
 
 
 class FRCNNImageFolder(datasets.ImageFolder):
-    def __init__(self, root: Path, label_dir: Path = None, transform=None, target_transform=None):
+    def __init__(
+        self,
+        root: Path,
+        label_dir: Optional[Path] = None,
+        transform: Optional[Callable] = None,
+        target_transform: Optional[Callable] = None,
+    ) -> None:
         super().__init__(root, transform=transform, target_transform=target_transform)
         self.label_dir = label_dir
 
@@ -18,28 +23,29 @@ class FRCNNImageFolder(datasets.ImageFolder):
             sample = self.transform(sample)
         if self.target_transform is not None:
             target = self.target_transform(target)
+        annotation = self.find_annotation(Path(path), target)
+        return sample, annotation
 
-        return sample, self.find_annotation(Path(path))
-
-    def find_annotation(self, path: Path) -> Path:
+    def find_annotation(self, path: Path, target: int) -> Optional[dict]:
         targets = []
-        label_path = self.label_dir.joinpath(path.stem).with_suffix(".txt")
+        if self.label_dir is not None:
+            label_path = self.label_dir.joinpath(path.stem).with_suffix(".txt")
         if label_path.exists():
             with open(label_path, "r") as f:
                 for line in f.readlines():
                     values = [float(x) for x in line.strip().split()]
-                    label, cx, cy, w, h = values  # YOLO format (normalized)
+                    _, cx, cy, w, h = values  # YOLO format (normalized)
                     x_min = int((cx - w / 2) * 244)
                     y_min = int((cy - h / 2) * 244)
                     x_max = int((cx + w / 2) * 244)
                     y_max = int((cy + h / 2) * 244)
 
-                    targets.append([x_min, y_min, x_max, y_max, label + 1])
+                    targets.append([x_min, y_min, x_max, y_max, target])
 
         if targets:
-            targets = torch.tensor(targets, dtype=torch.float32)
-            boxes = targets[:, :4]
-            labels = targets[:, 4].long()
+            new_targets = torch.tensor(targets, dtype=torch.float32)
+            boxes = new_targets[:, :4]
+            labels = new_targets[:, 4].long()
         else:
             return None
 
@@ -81,7 +87,7 @@ class Dataloader:
         return datasets.ImageFolder(self.data_path, transform=self.transformer)
 
     def get_loader(
-        self, dataset: torch.utils.data.Dataset, shuffle: bool, collate_fn=None
+        self, dataset: torch.utils.data.Dataset, shuffle: bool, collate_fn: Optional[Callable] = None
     ) -> torch.utils.data.DataLoader:
         return torch.utils.data.DataLoader(
             dataset, batch_size=self.batch_size, shuffle=shuffle, num_workers=self.workers, collate_fn=collate_fn
@@ -98,7 +104,7 @@ class Dataloader:
         return FRCNNImageFolder(self.data_path, self.annotations_path, transform=self.transformer)
 
     @staticmethod
-    def collate_fn(batch):
+    def collate_fn(batch: torch.tensor) -> Tuple[torch.tensor, torch.tensor]:
         images, targets = [], []
         for img, target in batch:
             if target is None:

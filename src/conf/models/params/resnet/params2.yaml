@@ -14,7 +14,7 @@ optimizers:
     lr: ${models.params.train.lr}
     momentum: ${models.params.train.momentum}
 
-model: 
+model:
   _target_: torchvision.models.resnet18
   pretrained: True
 classifier: fc

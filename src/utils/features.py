@@ -66,7 +66,7 @@ def generate_grad_cam_map(
     plt.show()
 
 
-def get_sample_images(txt_paths_list, image_paths_list, sample=8):
+def get_sample_images(txt_paths_list: list, image_paths_list: list, sample: int = 8) -> list:
     image_text = []
     for path in random.sample(txt_paths_list, sample):
         with open(path, 'r') as f:
@@ -77,7 +77,7 @@ def get_sample_images(txt_paths_list, image_paths_list, sample=8):
     return image_text
 
 
-def show_annotations(image_text, row_images=4):
+def show_annotations(image_text: list, row_images: int = 4) -> None:
     for j in range(0, len(image_text), row_images):
         fig, ax = plt.subplots(1, row_images, figsize=(15, 15))
         for i in range(j - row_images, j):
