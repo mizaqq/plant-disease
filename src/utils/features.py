@@ -94,8 +94,8 @@ def show_annotations(image_text: list, row_images: int = 4) -> None:
 
             x1 = int(x_center_pixel - bbox_width_pixel / 2)
             y1 = int(y_center_pixel - bbox_height_pixel / 2)
-            x2 = int(x_center_pixel + bbox_width_pixel / 2)
-            y2 = int(y_center_pixel + bbox_height_pixel / 2)
+            int(x_center_pixel + bbox_width_pixel / 2)
+            int(y_center_pixel + bbox_height_pixel / 2)
             ax[i - j].imshow(img)
             rect = patches.Rectangle(
                 (x1, y1), bbox_width_pixel, bbox_height_pixel, linewidth=2, edgecolor='lime', facecolor='none'

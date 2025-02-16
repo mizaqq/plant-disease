@@ -1,11 +1,9 @@
 import cv2
-import mlflow
 import torch
 from sklearn.metrics import accuracy_score, classification_report, f1_score, precision_score, recall_score
 from tqdm import tqdm
 
 from src.preprocessing.dataloader import Dataloader
-from sklearn.metrics import accuracy_score, classification_report, precision_score, recall_score, f1_score
 
 
 class Model:

@@ -1,17 +1,9 @@
-import cv2
-import torch
-import numpy as np
-import matplotlib.pyplot as plt
-from typing import List
-from src.preprocessing.dataloader import Dataloader
-
-
-import torch
-import numpy as np
-import matplotlib.pyplot as plt
-from PIL import Image, ImageDraw, ImageFont
-
 import random
+
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+from PIL import Image, ImageDraw
 
 
 def sample_images_prediction(
@@ -55,7 +47,7 @@ def draw_annotations(
         # Get predictions for this image
         boxes = preds[i]['boxes'].detach().cpu().numpy()
         labels = preds[i]['labels'].detach().cpu().numpy()
-        scores = preds[i]['scores'].detach().cpu().numpy()  # Get confidence scores
+        preds[i]['scores'].detach().cpu().numpy()  # Get confidence scores
 
         # if len(scores) > 0:
         #     best_idx = np.argmax(scores)  # Index of the highest-confidence prediction

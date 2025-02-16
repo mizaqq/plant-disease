@@ -5,7 +5,7 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 
 from src.model.cnn import Convolutional
-from src.model.lightning import LightningModule, FasterCNNLightning
+from src.model.lightning import FasterCNNLightning, LightningModule
 from src.model.models import PretrainedModel
 from src.model.train import Model
 from src.preprocessing.dataloader import Dataloader
@@ -49,7 +49,7 @@ def main(cfg: DictConfig) -> None:
                 mlflow=mlflow.logger,
                 epochs=cfg.models.params.train.epochs,
             )
-        model, results = model_light.train_model_lightning(dataloader)
+        model, results = model_light.train_model_lightning(dataloader.train_data, dataloader.test_data)
         for k, v in results[0].items():
             mlflow.manager.log_metric(k, v)
             print(f'{k}: {v}')

@@ -1,12 +1,14 @@
+from typing import Optional
+
 import lightning as L
+import numpy as np
 import torch
 import torch.nn.functional as F
 from sklearn.metrics import accuracy_score, classification_report, f1_score, precision_score, recall_score
 from torchvision.ops import box_iou
+
 from src.preprocessing.dataloader import Dataloader
 from src.utils.mlflow import MLFlowRunManager
-import numpy as np
-from typing import Optional
 
 
 class LightningModule(L.LightningModule):
@@ -14,7 +16,7 @@ class LightningModule(L.LightningModule):
         self,
         model: torch,
         optimizer: torch,
-        mlflow: MLFlowRunManager,
+        mlflow: Optional[MLFlowRunManager] = None,
         epochs: int = 10,
         metrics: list = [],
     ) -> None:
@@ -38,10 +40,14 @@ class LightningModule(L.LightningModule):
         optimizer = self.optimizer
         return optimizer
 
-    def train_model_lightning(self, data_loader: Dataloader) -> tuple[torch.nn.Module, dict]:
+    def train_model_lightning(
+        self, train_loader: Dataloader, test_loader: Dataloader = None
+    ) -> tuple[torch.nn.Module, dict]:
         trainer = L.Trainer(max_epochs=self.epochs, logger=self.mlflow)
-        trainer.fit(self, data_loader.train_loader)
-        test_result = trainer.test(self, dataloaders=data_loader.test_loader, verbose=False)
+        trainer.fit(self, train_loader)
+        test_result = {}
+        if test_loader is not None:
+            test_result = trainer.test(self, dataloaders=test_loader, verbose=False)
         return self.model, test_result
 
     def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:
@@ -64,7 +70,7 @@ class FasterCNNLightning(LightningModule):
         self,
         model: torch,
         optimizer: torch,
-        mlflow: MLFlowRunManager,
+        mlflow: Optional[MLFlowRunManager] = None,
         epochs: int = 10,
         metrics: list = [],
     ) -> None:
