@@ -49,7 +49,7 @@ def main(cfg: DictConfig) -> None:
                 mlflow=mlflow.logger,
                 epochs=cfg.models.params.train.epochs,
             )
-        model, results = model_light.train_model_lightning(dataloader.train_data, dataloader.test_data)
+        model, results = model_light.train_model_lightning(dataloader.train_loader, dataloader.test_loader)
         for k, v in results[0].items():
             mlflow.manager.log_metric(k, v)
             print(f'{k}: {v}')
