@@ -14,7 +14,8 @@ class Dataloader:
         batch_size: int = 32,
         size: int = 255,
         crop: int = 224,
-        split: float = 0.8,
+        train_split: float = 0.75,
+        val_split: float = 0.15,
         workers: int = 15,
     ) -> None:
         self.data_path = data_path
@@ -22,9 +23,10 @@ class Dataloader:
         self.batch_size = batch_size
         self.transformer = self.get_transformer(size, crop)
         self.dataset = self.get_dataset_with_annotations() if annotations_path is not None else self.get_dataset()
-        self.train_data, self.test_data = self.split_data(split)
+        self.train_data, self.validation_data, self.test_data = self.split_data(train_split, val_split)
         self.workers = workers
         self.train_loader = self.get_loader(self.train_data, batch_size, workers, shuffle=True)
+        self.validation_loader = self.get_loader(self.validation_data, batch_size, workers, shuffle=False)
         self.test_loader = self.get_loader(self.test_data, batch_size, workers, shuffle=False)
 
     @staticmethod
@@ -53,11 +55,11 @@ class Dataloader:
         )
 
     def split_data(
-        self, train_split: float, seed: int = 42
+        self, train_split: float, val_split: float, seed: int = 42
     ) -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
-        train_size = int(train_split * len(self.dataset))
-        test_size = len(self.dataset) - train_size
-        return torch.utils.data.random_split(self.dataset, [train_size, test_size], torch.Generator().manual_seed(seed))
+        return torch.utils.data.random_split(
+            self.dataset, [train_split, val_split, 1 - train_split - val_split], torch.Generator().manual_seed(seed)
+        )
 
     def get_dataset_with_annotations(self) -> datasets.ImageFolder:
         return FRCNNImageFolder(self.data_path, self.annotations_path, transform=self.transformer)
@@ -122,8 +124,8 @@ class FRCNNImageFolder(datasets.ImageFolder):
 
 class LabelStudioDataset(torch.utils.data.Dataset):
     def __init__(self, data: list, transform: transforms = None) -> None:
-        self.image_paths = [d['image'][14:] for d in data]
-        self.labels = [d['labels'] for d in data]
+        self.image_paths = [d['image'] for d in data]
+        self.labels = [d['label'] for d in data]
         self.transform = transform
 
     def __len__(self) -> int:
@@ -136,6 +138,6 @@ class LabelStudioDataset(torch.utils.data.Dataset):
         if self.transform:
             image = self.transform(image)
         target = torch.tensor(label, dtype=torch.float32)
-        boxes = target[:, :4]
-        labels = target[:, 4].long()
+        boxes = target[:4].view(1, 4)
+        labels = target[4].view(1).long()
         return image, {"boxes": boxes, "labels": labels}

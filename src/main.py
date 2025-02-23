@@ -30,6 +30,7 @@ def main(cfg: DictConfig) -> None:
         if cfg.models.type == 'fr-cnn':
             dataloader.train_loader.collate_fn = dataloader.collate_fn
             dataloader.test_loader.collate_fn = dataloader.collate_fn
+            dataloader.validation_loader.collate_fn = dataloader.collate_fn
         model = PretrainedModel.get_model(cfg)
     optimizer_cls = hydra.utils.get_class(cfg.models.params.optimizers._target_)
     optimizer_params = cfg.models.params.optimizers.params
@@ -49,7 +50,9 @@ def main(cfg: DictConfig) -> None:
                 mlflow=mlflow.logger,
                 epochs=cfg.models.params.train.epochs,
             )
-        model, results = model_light.train_model_lightning(dataloader.train_loader, dataloader.test_loader)
+        model, results = model_light.train_model_lightning(
+            dataloader.train_loader, dataloader.validation_loader, dataloader.test_loader
+        )
         for k, v in results[0].items():
             mlflow.manager.log_metric(k, v)
             print(f'{k}: {v}')
