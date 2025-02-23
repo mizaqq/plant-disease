@@ -94,7 +94,7 @@ class FasterCNNLightning(LightningModule):
         self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
         return loss
 
-    def validation_step(self, batch: torch.tensor, batch_idx: int) -> None:
+    def validation_step(self, batch: torch.tensor, batch_idx: int) -> Optional[float]:
         if len(batch[0]) == 0:
             return None
         else:

@@ -7,8 +7,8 @@ import os
 
 
 def parse_annotation_to_fasterrcnn_format(
-    annotation_data: dict, labels_list={'curl': 0, 'healthy': 1, 'slug': 2, 'spot': 3}
-) -> dict:
+    annotation_data: dict, labels_list: dict = {'curl': 0, 'healthy': 1, 'slug': 2, 'spot': 3}
+) -> Optional[dict]:
     try:
         value = annotation_data['result'][0]['value']
         rectangle_labels = value['rectanglelabels']

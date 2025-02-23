@@ -56,7 +56,7 @@ class Dataloader:
 
     def split_data(
         self, train_split: float, val_split: float, seed: int = 42
-    ) -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
+    ) -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset, torch.utils.data.Dataset]:
         return torch.utils.data.random_split(
             self.dataset, [train_split, val_split, 1 - train_split - val_split], torch.Generator().manual_seed(seed)
         )

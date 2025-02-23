@@ -8,6 +8,7 @@ import torch
 from label_studio_ml.model import LabelStudioMLBase
 from label_studio_ml.response import ModelResponse
 from PIL import Image
+from pytorch_lightning.loggers import MLFlowLogger
 
 from src.annotation.studio_backend.utils import (
     convert_boxes_to_ls_format,
@@ -16,7 +17,6 @@ from src.annotation.studio_backend.utils import (
 )
 from src.model.lightning import FasterCNNLightning
 from src.preprocessing.dataloader import Dataloader, LabelStudioDataset
-from pytorch_lightning.loggers import MLFlowLogger
 
 
 class NewModel(LabelStudioMLBase):
@@ -88,7 +88,7 @@ class NewModel(LabelStudioMLBase):
                 print('Not enough data for training. Please collect more annotations.')
 
     @staticmethod
-    def start_or_get_run():
+    def start_or_get_run() -> mlflow.ActiveRun:
         mlflow.set_tracking_uri(os.environ.get("MLFLOW_URI"))
         if run := mlflow.active_run() is not None:
             return run
@@ -137,14 +137,14 @@ class NewModel(LabelStudioMLBase):
         return model
 
     @staticmethod
-    def patch_model(model: torch.nn.Module) -> None:
+    def patch_model(model: torch.nn.Module) -> str:
         mlflow.pytorch.log_model(model, artifact_path="model")
         model_uri = f"runs:/{mlflow.active_run().info.run_id}/model"
         model_details = mlflow.register_model(model_uri=model_uri, name="label-studio2")
         return str(model_details.version)
 
     @staticmethod
-    def fetch_data(project_id: str = 1) -> None:
+    def fetch_data(project_id: str = '1') -> list:
         token = os.getenv("ls_token")
         url = f"http://localhost:8080/api/projects/{project_id}/export?exportType=JSON"
         headers = {"Authorization": f"Token {token}"}
@@ -154,4 +154,4 @@ class NewModel(LabelStudioMLBase):
             data = response.json()
             return parse_annotation_to_fasterrcnn_format_from_list(data)
         else:
-            print(f"Error: {response.status_code}, {response.text}")
+            return []
