@@ -1,0 +1,19 @@
+train:
+  lr: 0.001
+  momentum: 0.9
+  epochs: 5
+
+metrics:
+  - accuracy
+  - f1
+  - precision
+  - recall
+
+model: 
+  _target_: torchvision.models.resnet18
+  pretrained: True
+classifier: fc
+num_classes: 4
+frozen_layers: 60
+trainable_layers:
+  - None

@@ -29,7 +29,6 @@ class LightningModule(L.LightningModule):
         loss = F.cross_entropy(y_hat, y)
         return loss
 
-
     def configure_optimizers(self) -> torch.optim.Optimizer:
         optimizer = self.optimizer
         return optimizer
@@ -39,8 +38,7 @@ class LightningModule(L.LightningModule):
         trainer.fit(self, data_loader.train_loader)
         test_result = trainer.test(self, dataloaders=data_loader.test_loader, verbose=False)
         return self.model, test_result
-    
-    @staticmethod
+
     def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:
         images, labels = batch
         preds = self.model(images).argmax(dim=-1)
