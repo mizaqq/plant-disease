@@ -2,6 +2,7 @@ import os
 from typing import Optional
 
 import mlflow
+from pytorch_lightning.loggers import MLFlowLogger
 
 
 class MLFlowRunManager:
@@ -17,6 +18,9 @@ class MLFlowRunManager:
             self.manager.start_run(run_id)
         else:
             self.manager.start_run()
+        self.logger = MLFlowLogger(
+            experiment_name=experiment, tracking_uri=uri, run_id=self.manager.active_run().info.run_id
+        )
 
     def login(self, uri: str, experiment: str) -> None:
         self.manager.set_tracking_uri(uri)

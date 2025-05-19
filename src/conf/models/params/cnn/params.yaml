@@ -12,6 +12,13 @@ pool_indices:
   - 0
   - 2
 
+optimizers:
+  _target_: torch.optim.SGD
+  params:
+    lr: ${models.params.train.lr}
+    momentum: ${models.params.train.momentum}
+
+
 layers:
   conv1:
       _target_: torch.nn.Conv2d
